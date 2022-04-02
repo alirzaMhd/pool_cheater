@@ -4,23 +4,38 @@ import numpy as np
 class OtsuThresholding:
     def __init__(self, imageArray):
         self.imageArray=imageArray
+        
+    def getImageHistogram(self,imageArray):
+        hist=np.histogram( imageArray, 256 )[0]
+        return hist
+    
     def calculate(self):
-        pixelCounts = [np.sum(self.imageArray == i) for i in range(256)]
+        hist=self.getImageHistogram(self.imageArray)
+        
+        ROW, COLS = np.shape( self.imageArray )
+        TOTAL=ROW*COLS
+        HISTOGRAM_LENGTH = len(hist)
+        sum_total = 0
+        for x in range( 0, HISTOGRAM_LENGTH ):
+            sum_total += x * hist[x]
+	
+        weight_background= 0.0
+        sum_background= 0.0
+        inter_class_variances= []
 
-        mostCommonPixel = (0,0)
-        for threshold in range(256):
+        for threshold in range( 0, HISTOGRAM_LENGTH ):
+            weight_background+= hist[threshold]
+            if (weight_background == 0) :
+                continue
 
+            weight_foreground = TOTAL - weight_background
+            if (weight_foreground == 0 ):
+                break
 
-            w_0 = sum(pixelCounts[:threshold])
-            w_1 = sum(pixelCounts[threshold:])
+            sum_background+= threshold * hist[threshold]
+            mean_background= sum_background / weight_background
+            mean_foreground= (sum_total - sum_background) / weight_foreground
 
-            mu_0 = sum([i * pixelCounts[i] for i in range(0,threshold)]) / w_0 if w_0 > 0 else 0       
-            mu_1 = sum([i * pixelCounts[i] for i in range(threshold, 256)]) / w_1 if w_1 > 0 else 0
+            inter_class_variances.append( weight_background * weight_foreground * (mean_background - mean_foreground)**2 )
 
-
-            newPixel = np.clongdouble(w_0 * w_1 * (mu_0 - mu_1) ** 2)
-            if newPixel > mostCommonPixel[1]:
-                mostCommonPixel = (threshold, newPixel)
-        print(mostCommonPixel)
-        return ((self.imageArray > mostCommonPixel[0]) * 255).astype('uint8')
-
+        return ((self.imageArray > np.argmax(inter_class_variances)) * 255).astype('uint8')

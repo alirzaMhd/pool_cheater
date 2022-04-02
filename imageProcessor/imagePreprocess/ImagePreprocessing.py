@@ -7,7 +7,8 @@ from ImageReaderAndWriter import ImageReaderAndWriter
 
 class ImagePreprocessing:
     imageReaderAndWriter=ImageReaderAndWriter()
-    billiardTable=imageReaderAndWriter.getImageArray()
+    billiardImage=imageReaderAndWriter.readImage()
+    billiardTable=imageReaderAndWriter.getImageArray(billiardImage)
     
     
     medianFilter=MedianFilter(billiardTable)
@@ -16,8 +17,8 @@ class ImagePreprocessing:
     otsuThresholding=OtsuThresholding(billiardTable)
     billiardTable=otsuThresholding.calculate()
     
-    # dilation=Dilation(billiardTable)
-    # billiardTable=dilation.calculate(5)
+    dilation=Dilation(billiardTable)
+    billiardTable=dilation.calculate(3)
     
     newImage=imageReaderAndWriter.getImageFromArray(billiardTable)
     imageReaderAndWriter.showImage(newImage)
