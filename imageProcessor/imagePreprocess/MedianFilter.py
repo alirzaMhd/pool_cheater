@@ -1,6 +1,3 @@
-
-
-
 import numpy as np
 
 
@@ -8,7 +5,7 @@ class MedianFilter:
     def __init__(self, imageArray):
         self.imageArray=imageArray
     def calculate(self):
-        KERNEL=2
+        KERNEL=3
         INDEXER = KERNEL // 2
         temp = []
         finalImage = []
