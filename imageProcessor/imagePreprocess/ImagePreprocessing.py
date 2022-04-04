@@ -1,24 +1,22 @@
 import sys
 from MedianFilter import MedianFilter 
-from OtsuThresholding import OtsuThresholding
 from Dilation import Dilation
-sys.path.append('G:\SourceCode\python\PoolCheater\imageProcessor') 
-from ImageReaderAndWriter import ImageReaderAndWriter
+from IntegralThreshold import IntegralThreshold
 
 class ImagePreprocessing:
-    imageReaderAndWriter=ImageReaderAndWriter()
-    billiardImage=imageReaderAndWriter.readImage()
-    billiardTable=imageReaderAndWriter.getImageArray(billiardImage)
+    def __init__(self,billiardTable) :
+        self.billiardTable=billiardTable
+    
+    def calculator(self):
+        medianFilter=MedianFilter(self.billiardTable)
+        billiardTable=medianFilter.calculate()
+    
+        integralThreshold=IntegralThreshold(billiardTable)
+        billiardTable=integralThreshold.calculate()
+    
+        dilation=Dilation(billiardTable)
+        billiardTable=dilation.calculate(3)
     
     
-    medianFilter=MedianFilter(billiardTable)
-    billiardTable=medianFilter.calculate()
     
-    otsuThresholding=OtsuThresholding(billiardTable)
-    billiardTable=otsuThresholding.calculate()
     
-    dilation=Dilation(billiardTable)
-    billiardTable=dilation.calculate(3)
-    
-    newImage=imageReaderAndWriter.getImageFromArray(billiardTable)
-    imageReaderAndWriter.showImage(newImage)
